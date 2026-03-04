@@ -1,0 +1,21 @@
+# Environments
+.env
+*.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+.trae/
+
+# System
+.DS_Store
+
+# Application Data
+data/
+cookies.txt
+ARK_API_KEY.env
+app.db

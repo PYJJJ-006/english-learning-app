@@ -1,0 +1,5 @@
+Flask==3.0.0
+yt-dlp==2024.12.23
+faster-whisper==1.1.0
+volcengine-python-sdk[ark]>=5.0.0
+python-dotenv==1.0.0

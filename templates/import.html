@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="import-page">
+    <h2>导入B站视频</h2>
+    
+    <div class="import-form">
+        <div class="form-group">
+            <label for="video-url">B站视频链接</label>
+            <input type="text" id="video-url" placeholder="例如: https://www.bilibili.com/video/BV1NubkzEE3w">
+        </div>
+        <button id="import-btn" class="btn btn-primary">开始导入</button>
+    </div>
+    
+    <div id="progress-section" class="progress-section" style="display: none;">
+        <h3>处理进度</h3>
+        <div class="progress-steps">
+            <div class="step" id="step-download">
+                <span class="step-icon">⏳</span>
+                <span class="step-text">下载视频音频</span>
+            </div>
+            <div class="step" id="step-transcribe">
+                <span class="step-icon">⏳</span>
+                <span class="step-text">转录英文文本</span>
+            </div>
+            <div class="step" id="step-translate">
+                <span class="step-icon">⏳</span>
+                <span class="step-text">翻译成双语</span>
+            </div>
+        </div>
+        <p id="progress-message">准备中...</p>
+    </div>
+    
+    <div id="error-section" class="error-section" style="display: none;">
+        <p class="error-message" id="error-message"></p>
+    </div>
+</div>
+
+<script>
+document.getElementById('import-btn').addEventListener('click', async function() {
+    const urlInput = document.getElementById('video-url');
+    const url = urlInput.value.trim();
+    
+    if (!url) {
+        alert('请输入视频链接');
+        return;
+    }
+    
+    if (!url.includes('bilibili.com/video/')) {
+        alert('请输入有效的B站视频链接');
+        return;
+    }
+    
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = '处理中...';
+    
+    document.getElementById('progress-section').style.display = 'block';
+    document.getElementById('error-section').style.display = 'none';
+    
+    resetSteps();
+    
+    try {
+        const response = await fetch('/api/import', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: url })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || '启动处理失败');
+        }
+        
+        const videoId = data.video_id;
+        listenToProgress(videoId);
+        
+    } catch (error) {
+        showError(error.message);
+        btn.disabled = false;
+        btn.textContent = '开始导入';
+    }
+});
+
+function resetSteps() {
+    ['step-download', 'step-transcribe', 'step-translate'].forEach(id => {
+        document.getElementById(id).querySelector('.step-icon').textContent = '⏳';
+        document.getElementById(id).classList.remove('step-active', 'step-done', 'step-error');
+    });
+}
+
+function setStepStatus(stepId, status) {
+    const step = document.getElementById(stepId);
+    step.classList.remove('step-active', 'step-done', 'step-error');
+    
+    if (status === 'active') {
+        step.querySelector('.step-icon').textContent = '🔄';
+        step.classList.add('step-active');
+    } else if (status === 'done') {
+        step.querySelector('.step-icon').textContent = '✅';
+        step.classList.add('step-done');
+    } else if (status === 'error') {
+        step.querySelector('.step-icon').textContent = '❌';
+        step.classList.add('step-error');
+    }
+}
+
+function listenToProgress(videoId) {
+    const eventSource = new EventSource('/api/progress/' + videoId);
+    
+    eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        
+        document.getElementById('progress-message').textContent = data.message;
+        
+        if (data.step === 'download') {
+            setStepStatus('step-download', data.status === 'error' ? 'error' : 'active');
+        } else if (data.step === 'transcribe') {
+            setStepStatus('step-download', 'done');
+            setStepStatus('step-transcribe', data.status === 'error' ? 'error' : 'active');
+        } else if (data.step === 'translate') {
+            setStepStatus('step-download', 'done');
+            setStepStatus('step-transcribe', 'done');
+            setStepStatus('step-translate', data.status === 'error' ? 'error' : 'active');
+        } else if (data.step === 'done') {
+            setStepStatus('step-download', 'done');
+            setStepStatus('step-transcribe', 'done');
+            setStepStatus('step-translate', 'done');
+        }
+        
+        if (data.status === 'completed') {
+            eventSource.close();
+            document.getElementById('progress-message').textContent = '处理完成！正在跳转...';
+            setTimeout(() => {
+                window.location.href = '/practice/' + data.video_id;
+            }, 1000);
+        } else if (data.status === 'error') {
+            eventSource.close();
+            showError(data.message);
+            document.getElementById('import-btn').disabled = false;
+            document.getElementById('import-btn').textContent = '开始导入';
+        }
+    };
+    
+    eventSource.onerror = function() {
+        eventSource.close();
+        showError('连接中断，请重试');
+        document.getElementById('import-btn').disabled = false;
+        document.getElementById('import-btn').textContent = '开始导入';
+    };
+}
+
+function showError(message) {
+    document.getElementById('error-section').style.display = 'block';
+    document.getElementById('error-message').textContent = '错误: ' + message;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="import-page">
+    <h2>粘贴双语材料</h2>
+    
+    <div class="import-form">
+        <div class="form-group">
+            <label for="material-title">材料名称（可选）</label>
+            <input type="text" id="material-title" placeholder="例如：Dan Koe 学习方法（节选）">
+        </div>
+        <div class="form-group">
+            <label for="material-content">中英文双语内容</label>
+            <textarea id="material-content" placeholder="支持两种格式：\n1) 英文一行，中文下一行（中间可空行）\n2) 同一行用 Tab 分隔：英文\t中文\n\n例如：\nHello.\n你好。\n\nHow are you?\n你怎么样？" rows="12"></textarea>
+        </div>
+        <button id="paste-btn" class="btn btn-primary">创建练习集</button>
+    </div>
+    
+    <div id="progress-section" class="progress-section" style="display: none;">
+        <h3>处理进度</h3>
+        <p id="progress-message">准备中...</p>
+    </div>
+    
+    <div id="error-section" class="error-section" style="display: none;">
+        <p class="error-message" id="error-message"></p>
+    </div>
+</div>
+
+<script>
+document.getElementById('paste-btn').addEventListener('click', async function() {
+    const title = document.getElementById('material-title').value.trim();
+    const content = document.getElementById('material-content').value.trim();
+    
+    if (!content) {
+        alert('请输入中英文双语内容');
+        return;
+    }
+    
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = '处理中...';
+    
+    document.getElementById('progress-section').style.display = 'block';
+    document.getElementById('error-section').style.display = 'none';
+    document.getElementById('progress-message').textContent = '正在创建练习集...';
+    
+    try {
+        const response = await fetch('/api/paste', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: title, content: content })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || '创建失败');
+        }
+        
+        document.getElementById('progress-message').textContent = `创建完成（句子数：${data.sentence_count}），正在跳转...`;
+        setTimeout(() => {
+            window.location.href = '/practice/' + data.video_id;
+        }, 500);
+        
+    } catch (error) {
+        showError(error.message);
+        btn.disabled = false;
+        btn.textContent = '创建练习集';
+        document.getElementById('progress-section').style.display = 'none';
+    }
+});
+
+function showError(message) {
+    document.getElementById('error-section').style.display = 'block';
+    document.getElementById('error-message').textContent = '错误: ' + message;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="practice-page">
+    <div class="practice-header">
+        <h2>{{ video['title'] }}</h2>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">返回列表</a>
+    </div>
+    
+    <div class="practice-container">
+        <div class="sentence-display">
+            <div class="sentence-label">中文句子</div>
+            <p id="chinese-sentence" class="chinese-text"></p>
+        </div>
+        
+        <div class="input-section">
+            <div class="sentence-label">请写出对应的英文句子</div>
+            <textarea id="user-input" placeholder="在这里输入英文..." rows="3"></textarea>
+            <div class="button-group">
+                <button id="submit-btn" class="btn btn-primary">提交答案</button>
+                <button id="show-answer-btn" class="btn btn-secondary">查看答案</button>
+            </div>
+        </div>
+        
+        <div id="answer-section" class="answer-section" style="display: none;">
+            <div class="answer-actions">
+                <button id="close-answer-btn" class="btn btn-secondary btn-sm">关闭答案</button>
+            </div>
+            <div class="answer-block">
+                <div class="sentence-label">你的答案</div>
+                <p id="user-answer" class="answer-text user-answer"></p>
+            </div>
+            <div class="answer-block">
+                <div class="sentence-label">正确答案</div>
+                <p id="correct-answer" class="answer-text correct-answer"></p>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button id="prev-btn" class="btn btn-secondary">上一句</button>
+            <span id="progress-text" class="progress-text">1 / {{ sentences|length }}</span>
+            <button id="next-btn" class="btn btn-primary">下一句</button>
+        </div>
+    </div>
+</div>
+
+<script id="sentences-data" type="application/json">{{ sentences | tojson }}</script>
+<script>
+const sentences = JSON.parse(document.getElementById('sentences-data').textContent);
+let currentIndex = 0;
+
+function updateDisplay() {
+    const sentence = sentences[currentIndex];
+    document.getElementById('chinese-sentence').textContent = sentence.chinese;
+    document.getElementById('user-input').value = '';
+    document.getElementById('answer-section').style.display = 'none';
+    document.getElementById('progress-text').textContent = (currentIndex + 1) + ' / ' + sentences.length;
+    
+    document.getElementById('prev-btn').disabled = currentIndex === 0;
+    document.getElementById('next-btn').disabled = currentIndex === sentences.length - 1;
+}
+
+document.getElementById('submit-btn').addEventListener('click', function() {
+    const userInput = document.getElementById('user-input').value.trim();
+    if (!userInput) {
+        alert('请输入你的答案');
+        return;
+    }
+    
+    document.getElementById('user-answer').textContent = userInput;
+    document.getElementById('correct-answer').textContent = sentences[currentIndex].english;
+    document.getElementById('answer-section').style.display = 'block';
+});
+
+document.getElementById('show-answer-btn').addEventListener('click', function() {
+    document.getElementById('user-answer').textContent = document.getElementById('user-input').value.trim() || '(未作答)';
+    document.getElementById('correct-answer').textContent = sentences[currentIndex].english;
+    document.getElementById('answer-section').style.display = 'block';
+});
+
+document.getElementById('close-answer-btn').addEventListener('click', function() {
+    document.getElementById('answer-section').style.display = 'none';
+    document.getElementById('user-input').focus();
+});
+
+document.getElementById('prev-btn').addEventListener('click', function() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        updateDisplay();
+    }
+});
+
+document.getElementById('next-btn').addEventListener('click', function() {
+    if (currentIndex < sentences.length - 1) {
+        currentIndex++;
+        updateDisplay();
+    }
+});
+
+updateDisplay();
+</script>
+{% endblock %}
