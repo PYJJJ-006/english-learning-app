@@ -63,6 +63,67 @@ FLASK_APP=app.py flask run --host 0.0.0.0 --port 5000
 
 3. 在手机浏览器打开 `http://<电脑局域网IP>:5000`
 
+## 桌面版（Tauri）
+
+桌面版会自动启动本地 Flask 服务，并用桌面窗口加载 `http://127.0.0.1:5000`，实现“像 App 一样点开即用”。
+
+### 前置依赖
+
+1. 安装 Node.js 18+ 与 Rust 工具链
+2. 安装 Python 依赖（完整导入流程需要额外依赖）
+
+```bash
+pip install -r requirements.txt
+pip install yt-dlp faster-whisper volcenginesdkarkruntime
+```
+
+### 开发模式运行
+
+```bash
+cd desktop
+npm install
+npm run dev
+```
+
+### 打包与使用
+
+```bash
+cd desktop
+npm run build
+```
+
+打包完成后，在以下目录找到桌面应用并双击运行：
+
+- `desktop/src-tauri/target/release/bundle/macos/BackIt.app`
+
+如果提示找不到 `cargo`，请先执行：
+
+```bash
+source "$HOME/.cargo/env"
+```
+
+如果提示找不到 `python3`，可以在启动前设置：
+
+```bash
+export PYTHON_BIN="/usr/bin/python3"
+```
+
+### 桌面版数据与密钥位置（macOS）
+
+桌面版会将数据与配置写入用户目录，避免写入应用包：
+
+- 数据目录：`~/Library/Application Support/BackIt/data`
+- 密钥文件：`~/Library/Application Support/BackIt/ARK_API_KEY.env`
+- Cookie 文件：`~/Library/Application Support/BackIt/data/cookies.txt`
+
+你可以在上述目录创建 `ARK_API_KEY.env`，内容与本地开发一致：
+
+```
+export ARK_API_KEY="your-api-key"
+export ARK_ENDPOINT_ID="your-endpoint-id"
+export ARK_BASE_URL="https://ark.cn-beijing.volces.com/api/v3"
+```
+
 ## 使用说明
 
 ### 导入视频

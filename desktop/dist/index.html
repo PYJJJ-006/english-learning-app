@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+文件名: index.html
+描述: 桌面壳占位页面，在开发/打包时提供静态兜底入口。
+作用: 当本地服务不可达时提示用户启动服务或检查环境。
+-->
+<html lang="zh-CN">
+  <head>
+    <!-- 页面基础元信息，保证桌面窗口在无法加载时仍能显示提示 -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BackIt 桌面端</title>
+    <style>
+      /* 基础样式，保证提示信息在桌面窗口中居中显示 */
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      main {
+        text-align: center;
+        max-width: 520px;
+        padding: 24px;
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 22px;
+      }
+      p {
+        margin: 6px 0;
+        color: #cbd5f5;
+        line-height: 1.6;
+      }
+      code {
+        background: rgba(148, 163, 184, 0.2);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 提示用户本地服务未启动时的操作步骤 -->
+    <main>
+      <h1>BackIt 桌面端准备就绪</h1>
+      <p>当前窗口未连接到本地服务。</p>
+      <p>请确保已启动本地服务，或在桌面端内等待服务自动拉起。</p>
+      <p>本地服务地址默认是 <code>http://127.0.0.1:5000</code>。</p>
+    </main>
+  </body>
+</html>

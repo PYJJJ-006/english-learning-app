@@ -1,0 +1,32 @@
+{
+  "productName": "BackIt",
+  "version": "0.1.0",
+  "identifier": "com.backit.desktop",
+  "build": {
+    "devUrl": "http://127.0.0.1:5000",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "BackIt",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "url": "http://127.0.0.1:5000"
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "resources": [
+      "../../app.py",
+      "../../config.py",
+      "../../services",
+      "../../templates",
+      "../../static",
+      "../../requirements.txt",
+      "../../ARK_API_KEY.env.example"
+    ]
+  }
+}

@@ -13,6 +13,10 @@ __pycache__/
 .npm/
 .vercel-global/
 Library/
+desktop/node_modules/
+desktop/src-tauri/target/
+desktop/target/
+desktop/src-tauri/icons/
 
 # System
 .DS_Store
