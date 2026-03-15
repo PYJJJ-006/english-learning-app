@@ -1,3 +1,8 @@
+<!--
+文件名: practice.html
+描述: 练习页面模板，包含桌面端默写输入与答案显示。
+作用: 承载桌面端默写流程与答案对照。
+-->
 {% extends "base.html" %}
 
 {% block content %}
@@ -13,12 +18,13 @@
             <p id="chinese-sentence" class="chinese-text"></p>
         </div>
         
-        <div class="input-section">
+        <div class="input-section mobile-hide">
             <div class="sentence-label">请写出对应的英文句子</div>
             <textarea id="user-input" placeholder="在这里输入英文..." rows="3"></textarea>
             <div class="button-group">
                 <button id="submit-btn" class="btn btn-primary">提交答案</button>
                 <button id="show-answer-btn" class="btn btn-secondary">查看答案</button>
+                <button id="clear-input-btn" class="btn btn-secondary">清空输入</button>
             </div>
         </div>
         
@@ -46,9 +52,11 @@
 
 <script id="sentences-data" type="application/json">{{ sentences | tojson }}</script>
 <script>
+// 读取服务端注入的句子数据，作为本地练习数据源
 const sentences = JSON.parse(document.getElementById('sentences-data').textContent);
 let currentIndex = 0;
 
+// 切换到当前句子并重置答案区
 function updateDisplay() {
     const sentence = sentences[currentIndex];
     document.getElementById('chinese-sentence').textContent = sentence.chinese;
@@ -60,6 +68,7 @@ function updateDisplay() {
     document.getElementById('next-btn').disabled = currentIndex === sentences.length - 1;
 }
 
+// 绑定提交按钮，校验输入并展示答案对照
 document.getElementById('submit-btn').addEventListener('click', function() {
     const userInput = document.getElementById('user-input').value.trim();
     if (!userInput) {
@@ -72,17 +81,26 @@ document.getElementById('submit-btn').addEventListener('click', function() {
     document.getElementById('answer-section').style.display = 'block';
 });
 
+// 绑定查看答案按钮，直接展示当前句答案
 document.getElementById('show-answer-btn').addEventListener('click', function() {
     document.getElementById('user-answer').textContent = document.getElementById('user-input').value.trim() || '(未作答)';
     document.getElementById('correct-answer').textContent = sentences[currentIndex].english;
     document.getElementById('answer-section').style.display = 'block';
 });
 
+document.getElementById('clear-input-btn').addEventListener('click', function() {
+    const userInput = document.getElementById('user-input');
+    userInput.value = '';
+    userInput.focus();
+});
+
+// 绑定关闭按钮，用于收起答案并回到输入区
 document.getElementById('close-answer-btn').addEventListener('click', function() {
     document.getElementById('answer-section').style.display = 'none';
     document.getElementById('user-input').focus();
 });
 
+// 绑定上一句按钮，用于向前翻句
 document.getElementById('prev-btn').addEventListener('click', function() {
     if (currentIndex > 0) {
         currentIndex--;
@@ -90,6 +108,7 @@ document.getElementById('prev-btn').addEventListener('click', function() {
     }
 });
 
+// 绑定下一句按钮，用于向后翻句
 document.getElementById('next-btn').addEventListener('click', function() {
     if (currentIndex < sentences.length - 1) {
         currentIndex++;
@@ -97,6 +116,7 @@ document.getElementById('next-btn').addEventListener('click', function() {
     }
 });
 
+// 页面初始化时渲染首句
 updateDisplay();
 </script>
 {% endblock %}

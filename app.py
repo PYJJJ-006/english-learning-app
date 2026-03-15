@@ -1,3 +1,8 @@
+"""
+文件名: app.py
+描述: Flask 应用路由与 API，支撑练习流程与数据管理。
+作用: 提供页面渲染、句子接口与导入处理入口。
+"""
 import os
 import json
 import sqlite3
@@ -51,6 +56,9 @@ def paste_page():
 
 @app.route('/api/import', methods=['POST'])
 def start_import():
+    if os.environ.get('VERCEL') == '1':
+        return jsonify({'error': '云端暂不支持直接导入B站视频，请先在本地导入后再在手机端练习，或使用“粘贴材料”功能'}), 503
+
     data = request.get_json()
     video_url = data.get('url', '').strip()
     
@@ -169,6 +177,24 @@ def practice(video_id):
     sentences = parse_bilingual(content)
     
     return render_template('practice.html', video=video, sentences=sentences)
+
+@app.route('/mobile/reading/<video_id>')
+# 渲染移动端阅读模式页面壳，数据由前端异步获取
+def mobile_reading(video_id):
+    video_dir = os.path.join(app.config['VIDEOS_DIR'], video_id)
+    if not os.path.exists(video_dir):
+        return redirect(url_for('index'))
+    
+    conn = sqlite3.connect(app.config['DATABASE_PATH'])
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    video = c.execute('SELECT * FROM videos WHERE id = ?', (video_id,)).fetchone()
+    conn.close()
+    
+    if not video:
+        return redirect(url_for('index'))
+    
+    return render_template('mobile_reading.html', video=video)
 
 def parse_bilingual(content):
     lines = content.strip().split('\n')

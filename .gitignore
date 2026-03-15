@@ -10,6 +10,9 @@ __pycache__/
 .vscode/
 .idea/
 .trae/
+.npm/
+.vercel-global/
+Library/
 
 # System
 .DS_Store
@@ -19,3 +22,4 @@ data/
 cookies.txt
 ARK_API_KEY.env
 app.db
+.vercel

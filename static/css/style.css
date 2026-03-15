@@ -1,3 +1,8 @@
+/*
+文件名: style.css
+描述: 全站基础样式与移动端阅读模式样式定义。
+作用: 统一页面视觉风格并提供移动端适配规则。
+*/
 * {
     margin: 0;
     padding: 0;
@@ -377,4 +382,59 @@ nav a:hover {
     color: #7f8c8d;
     min-width: 60px;
     text-align: center;
+}
+
+.reading-page {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.reading-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.reading-actions {
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.mobile-only {
+    display: none;
+}
+
+/* 移动端响应式规则，用于隐藏桌面操作与优化布局 */
+@media (max-width: 768px) {
+    /* 隐藏导入与默写输入相关区域，突出阅读模式 */
+    .mobile-hide {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: inline-flex;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    nav a {
+        margin-left: 0;
+        margin-right: 12px;
+    }
+
+    .video-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .practice-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
 }

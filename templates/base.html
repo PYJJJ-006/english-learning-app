@@ -1,3 +1,8 @@
+<!--
+文件名: base.html
+描述: 基础布局模板，提供全站标题栏与内容插槽。
+作用: 统一页面结构与导航入口。
+-->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -12,8 +17,8 @@
             <h1>英语背诵学习</h1>
             <nav>
                 <a href="{{ url_for('index') }}">首页</a>
-                <a href="{{ url_for('import_page') }}">导入视频</a>
-                <a href="{{ url_for('paste_page') }}">粘贴材料</a>
+                <a href="{{ url_for('import_page') }}" class="mobile-hide">导入视频</a>
+                <a href="{{ url_for('paste_page') }}" class="mobile-hide">粘贴材料</a>
             </nav>
         </header>
         

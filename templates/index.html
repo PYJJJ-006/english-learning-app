@@ -1,11 +1,16 @@
+<!--
+文件名: index.html
+描述: 练习集列表页，包含桌面操作入口与移动端阅读入口。
+作用: 作为课程列表页并分流到桌面/移动入口。
+-->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="page-header">
     <h2>我的练习集</h2>
     <div class="video-actions">
-        <a href="{{ url_for('paste_page') }}" class="btn btn-secondary">粘贴双语材料</a>
-        <a href="{{ url_for('import_page') }}" class="btn btn-primary">导入新视频</a>
+        <a href="{{ url_for('paste_page') }}" class="btn btn-secondary mobile-hide">粘贴双语材料</a>
+        <a href="{{ url_for('import_page') }}" class="btn btn-primary mobile-hide">导入新视频</a>
     </div>
 </div>
 
@@ -21,7 +26,8 @@
             </p>
         </div>
         <div class="video-actions">
-            <a href="{{ url_for('practice', video_id=video['id']) }}" class="btn btn-success">开始练习</a>
+            <a href="{{ url_for('practice', video_id=video['id']) }}" class="btn btn-success mobile-hide">开始练习</a>
+            <a href="{{ url_for('mobile_reading', video_id=video['id']) }}" class="btn btn-primary mobile-only">阅读模式</a>
             <form action="{{ url_for('delete_video', video_id=video['id']) }}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-danger" onclick="return confirm('确定要删除吗？')">删除</button>
             </form>
@@ -32,7 +38,7 @@
 {% else %}
 <div class="empty-state">
     <p>还没有导入任何视频</p>
-    <a href="{{ url_for('import_page') }}" class="btn btn-primary">导入第一个视频</a>
+    <a href="{{ url_for('import_page') }}" class="btn btn-primary mobile-hide">导入第一个视频</a>
 </div>
 {% endif %}
 {% endblock %}

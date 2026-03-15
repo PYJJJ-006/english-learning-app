@@ -9,6 +9,7 @@
 - 🌐 **智能翻译**：调用火山引擎大模型，生成中英双语对照
 - ✍️ **默写练习**：看中文句子，默写英文句子
 - 📊 **答案对比**：提交后查看正确答案，对比学习
+- 📱 **移动端阅读**：手机浏览器阅读模式，支持查看/隐藏答案
 
 ## 快速开始
 
@@ -16,6 +17,12 @@
 
 ```bash
 pip install -r requirements.txt
+```
+
+如需使用「视频导入/转录/翻译」完整流程，请额外安装：
+
+```bash
+pip install yt-dlp faster-whisper volcenginesdkarkruntime
 ```
 
 ### 2. 启动应用
@@ -34,6 +41,28 @@ python3 app.py
 
 打开浏览器访问：http://127.0.0.1:5000
 
+## 部署（Vercel）
+
+1. 在 Vercel 创建新项目并导入该仓库
+2. 项目根目录已包含 `vercel.json`，无需额外构建命令
+3. 在 Vercel 配置环境变量（至少包含）：
+   - `ARK_API_KEY`
+   - `ARK_ENDPOINT_ID`
+   - `ARK_BASE_URL`（可选，默认 https://ark.cn-beijing.volces.com/api/v3）
+4. 部署完成后直接访问 Vercel 提供的域名
+5. 由于云端限制，Vercel 仅保留「粘贴材料/练习/移动端阅读」，导入 B 站视频会提示不可用
+
+## 手机访问（局域网）
+
+1. 确保电脑与手机处于同一 Wi‑Fi
+2. 用以下命令启动并监听所有网卡：
+
+```bash
+FLASK_APP=app.py flask run --host 0.0.0.0 --port 5000
+```
+
+3. 在手机浏览器打开 `http://<电脑局域网IP>:5000`
+
 ## 使用说明
 
 ### 导入视频
@@ -50,11 +79,17 @@ python3 app.py
 3. 点击「提交答案」查看对比
 4. 使用「上一句」「下一句」翻页
 
+### 移动端阅读模式
+
+1. 列表页点击「阅读模式」进入手机阅读页
+2. 通过「查看答案/隐藏答案」按钮切换显示
+3. 点击「下一句」继续阅读
+
 ## 配置说明
 
 ### API 密钥配置
 
-复制 `ARK_API_KEY.env.example` 为 `ARK_API_KEY.env`，并在其中配置火山引擎 API：
+复制 `ARK_API_KEY.env.example` 为 `ARK_API_KEY.env`，并在其中配置火山引擎 API（该文件已加入 .gitignore，不会提交）：
 
 ```bash
 cp ARK_API_KEY.env.example ARK_API_KEY.env
@@ -70,7 +105,7 @@ export ARK_BASE_URL="https://ark.cn-beijing.volces.com/api/v3"
 
 ### Cookie 配置
 
-如果 B站视频需要登录才能观看，需要更新 `cookies.txt` 文件：
+如果 B站视频需要登录才能观看，需要更新 `cookies.txt` 文件（该文件已加入 .gitignore，不会提交）：
 
 1. 安装 Chrome 扩展 [EditThisCookie](https://chromewebstore.google.com/detail/editthiscookie/)
 2. 登录 B站
@@ -80,14 +115,14 @@ export ARK_BASE_URL="https://ark.cn-beijing.volces.com/api/v3"
 ## 项目结构
 
 ```
-real v1/
+mobileversion v1/
 ├── app.py                 # Flask 主应用
 ├── config.py              # 配置管理
 ├── start.sh               # 启动脚本
 ├── requirements.txt       # 依赖包
-├── ARK_API_KEY.env        # API 密钥配置
-├── cookies.txt            # B站 Cookie
-├── data/                  # 数据目录
+├── ARK_API_KEY.env        # API 密钥配置（本地文件，已忽略）
+├── cookies.txt            # B站 Cookie（本地文件，已忽略）
+├── data/                  # 数据目录（运行时生成，已忽略）
 │   ├── videos/           # 视频练习集
 │   └── app.db            # SQLite 数据库
 ├── services/              # 业务逻辑
@@ -96,6 +131,7 @@ real v1/
 │   ├── translator.py
 │   └── video_processor.py
 ├── templates/             # HTML 模板
+│   ├── mobile_reading.html
 └── static/                # 静态文件
 ```
 
